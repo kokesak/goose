@@ -9,10 +9,7 @@ URL:            https://github.com/block/goose
 Source:         %{url}/archive/v%{version}/goose-%{version}.tar.gz
 
 # Patches to remove windows dependencies from the crates
-Patch0:         goose-bench-remove-windows-cfg.patch
-Patch1:         goose-cli-remove-windows-cfg.patch
-Patch2:         goose-windows-cfg.patch
-Patch4:         goose-server-remove-windows-cfg.patch
+Patch:          0001-Remove-windows-cfg-from-Cargo.toml.patch
 
 License:  %{shrink:
     (Apache-2.0 OR MIT) AND BSD-3-Clause
@@ -105,10 +102,6 @@ tomcli set crates/goose/Cargo.toml str dependencies.minijinja ">=2.10.2,<=3.0.0"
 # Relax dependency for lopdf
 tomcli set crates/goose-mcp/Cargo.toml str dependencies.lopdf ">=0.35.0,<=0.37.0"
 
-# Remove apple/windows features from keyring
-tomcli set crates/goose-mcp/Cargo.toml lists delitem dependencies.keyring.features windows-native
-tomcli set crates/goose-mcp/Cargo.toml lists delitem dependencies.keyring.features apple-native
-
 # Relax dependency for indicatif
 tomcli set crates/goose-cli/Cargo.toml str dependencies.indicatif ">=0.16.2,<=0.19.0"
 
@@ -132,6 +125,26 @@ tomcli set crates/goose-server/Cargo.toml str dependencies.config ">=0.14.1,<=0.
 
 # Relax dependency for bat
 tomcli set crates/goose-cli/Cargo.toml str dependencies.bat ">=0.24.0,<=0.27.0"
+
+# Remove unused dependencies
+# Based on https://github.com/block/goose/pull/6380/changes
+tomcli set crates/goose-cli/Cargo.toml del "dependencies.agent-client-protocol-schema"
+tomcli set crates/goose-cli/Cargo.toml del "dependencies.is-terminal"
+tomcli set crates/goose-cli/Cargo.toml del "dependencies.jsonschema"
+
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.http-body-util"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.keyring"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.oauth2"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.hyper"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.serde_with"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.streaming-iterator"
+tomcli set crates/goose-mcp/Cargo.toml del "dependencies.clap"
+
+tomcli set crates/goose/Cargo.toml del "dev-dependencies.agent-client-protocol-schema"
+tomcli set crates/goose/Cargo.toml del "dependencies.tonic"
+tomcli set crates/goose/Cargo.toml lists delitem "dependencies.opentelemetry-otlp.features" "grpc-tonic"
+tomcli set crates/goose/Cargo.toml del "dependencies.oauth2"
+tomcli set crates/goose/Cargo.toml del "dependencies.boa_gc"
 
 %cargo_prep
 

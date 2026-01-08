@@ -1,0 +1,71 @@
+From 6175736812ac15e69a1447d86dbcc222b7f40170 Mon Sep 17 00:00:00 2001
+From: Rodolfo Olivieri <rodolfo.olivieri3@gmail.com>
+Date: Thu, 8 Jan 2026 10:19:07 -0300
+Subject: [PATCH] Remove windows cfg from Cargo.toml
+
+The goose-bench, goose-cli, goose-server and goose crates all have
+windows dependencies that are not available during build for Fedora.
+This patch removes them as there is no need to keep them around.
+---
+ crates/goose-bench/Cargo.toml  | 3 ---
+ crates/goose-cli/Cargo.toml    | 3 ---
+ crates/goose-server/Cargo.toml | 3 ---
+ crates/goose/Cargo.toml        | 3 ---
+ 4 files changed, 12 deletions(-)
+
+diff --git a/crates/goose-bench/Cargo.toml b/crates/goose-bench/Cargo.toml
+index cabba612..e1e8756d 100644
+--- a/crates/goose-bench/Cargo.toml
++++ b/crates/goose-bench/Cargo.toml
+@@ -27,6 +27,3 @@ include_dir = "0.7.4"
+ once_cell = "1.19"
+ regex = "1.11.1"
+ dotenvy = "0.15.7"
+-
+-[target.'cfg(target_os = "windows")'.dependencies]
+-winapi = { version = "0.3", features = ["wincred"] }
+diff --git a/crates/goose-cli/Cargo.toml b/crates/goose-cli/Cargo.toml
+index a043894f..e1e2f3ec 100644
+--- a/crates/goose-cli/Cargo.toml
++++ b/crates/goose-cli/Cargo.toml
+@@ -63,9 +63,6 @@ open = "5.3.2"
+ urlencoding = "2.1"
+ clap_complete = "4.5.62"
+ 
+-[target.'cfg(target_os = "windows")'.dependencies]
+-winapi = { version = "0.3", features = ["wincred"] }
+-
+ [features]
+ # disables the update command
+ disable-update = []
+diff --git a/crates/goose-server/Cargo.toml b/crates/goose-server/Cargo.toml
+index f990b388..cd44fc77 100644
+--- a/crates/goose-server/Cargo.toml
++++ b/crates/goose-server/Cargo.toml
+@@ -47,9 +47,6 @@ socket2 = "0.6.1"
+ fs2 = "0.4.3"
+ rustls = { version = "0.23", features = ["ring"] }
+ 
+-[target.'cfg(windows)'.dependencies]
+-winreg = { version = "0.55.0" }
+-
+ [[bin]]
+ name = "goosed"
+ path = "src/main.rs"
+diff --git a/crates/goose/Cargo.toml b/crates/goose/Cargo.toml
+index 9a2f93eb..20ca4ec0 100644
+--- a/crates/goose/Cargo.toml
++++ b/crates/goose/Cargo.toml
+@@ -115,9 +115,6 @@ boa_engine = "0.21.0"
+ boa_gc = "0.21"
+ unbinder = "0.1.7"
+ 
+-[target.'cfg(target_os = "windows")'.dependencies]
+-winapi = { version = "0.3", features = ["wincred"] }
+-
+ [dev-dependencies]
+ sacp = { workspace = true }
+ agent-client-protocol-schema = "0.10.5"
+-- 
+2.52.0
+
