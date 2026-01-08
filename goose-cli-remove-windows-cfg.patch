@@ -1,0 +1,12 @@
+--- goose-1.17.0/crates/goose-cli/Cargo.toml
++++ goose-1.17.0/crates/goose-cli/Cargo.toml
+@@ -61,9 +61,6 @@
+ open = "5.3.2"
+ urlencoding = "2.1"
+
+-[target.'cfg(target_os = "windows")'.dependencies]
+-winapi = { version = "0.3", features = ["wincred"] }
+-
+
+ [dev-dependencies]
+ tempfile = "3"

@@ -1,0 +1,12 @@
+--- goose-1.17.0/crates/goose-server/Cargo.toml
++++ goose-1.17.0/crates/goose-server/Cargo.toml
+@@ -47,9 +47,6 @@
+ fs2 = "0.4.3"
+ rustls = { version = "0.23", features = ["ring"] }
+
+-[target.'cfg(windows)'.dependencies]
+-winreg = { version = "0.55.0" }
+-
+ [[bin]]
+ name = "goosed"
+ path = "src/main.rs"

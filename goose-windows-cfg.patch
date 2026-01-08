@@ -1,0 +1,12 @@
+--- goose-1.17.0/crates/goose/Cargo.toml
++++ goose-1.17.0/crates/goose/Cargo.toml
+@@ -115,9 +115,6 @@
+ boa_engine = "0.21.0"
+ boa_gc = "0.21"
+
+-[target.'cfg(target_os = "windows")'.dependencies]
+-winapi = { version = "0.3", features = ["wincred"] }
+-
+ [dev-dependencies]
+ criterion = "0.5"
+ serial_test = "3.2.0"
