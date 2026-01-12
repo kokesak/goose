@@ -1,12 +1,18 @@
 NAME := goose
-PKG_NAME := goose
+PKG_NAME := $(NAME)
 TOOL2RPM := rust2rpm
-COPR_USERNAME := r0x0d
+FAS_USERNAME := r0x0d
+FILES_TO_SYNC := $(wildcard *.src.rpm) $(wildcard *.spec) generate-vendor-tarball.sh
+
+ifneq ("$(wildcard rust2rpm.toml)","")
+FILES_TO_SYNC += rust2rpm.toml
+endif
 
 .PHONY: create-copr-repo
 create-copr-repo:
 	copr create \
 		--chroot fedora-43-x86_64 \
+		--chroot fedora-44-x86_64 \
 		--chroot fedora-rawhide-x86_64 \
 		$(NAME)
 
@@ -38,9 +44,15 @@ srpm:
 build: srpm
 	copr build $(NAME) $(NAME)*.src.rpm \
 		--chroot fedora-43-x86_64 \
-		--chroot fedora-rawhide-x86_64
+		--chroot fedora-44-x86_64 \
+		--chroot fedora-rawhide-x86_64 \
+		--timeout 36000
 
 .PHONY: logs
 logs:
 	@command -v fuzzytail > /dev/null || { echo >&2 "fuzzytail is not installed. Install with pip install fuzzytail"; }
-	fuzzytail watch $(COPR_USERNAME)/$(NAME)
+	fuzzytail watch $(FAS_USERNAME)/$(NAME)
+
+.PHONY: sync
+sync:
+	scp $(FILES_TO_SYNC) $(FAS_USERNAME)@fedorapeople.org:/home/fedora/$(FAS_USERNAME)/public_html/$(NAME)

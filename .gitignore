@@ -1,3 +1,5 @@
 *.crate
 *.tar.gz
 *.src.rpm
+goose-source
+*-vendor.tar.xz

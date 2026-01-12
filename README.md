@@ -44,3 +44,15 @@ are persisted somewhere.
 # settings.
 make create-gh-repo
 ```
+
+## Generate patches for downstream
+
+```bash
+git clone git@github.com:block/goose goose-source
+cd goose-source
+git checkout $TAG
+# ... modify the source ...
+git add -u && git commit
+# ... write your commit message ...
+git format-patch -<number of commits to generate patch>
+```
