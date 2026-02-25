@@ -128,6 +128,7 @@ def main():
     args = parse_args()
     config = args.config
 
+    config.parent.mkdir(parents=True, exist_ok=True)
     if not config.exists():
         config.write_text(DEFAULT_CONFIG)
     elif args.overwrite:
