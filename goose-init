@@ -1,0 +1,85 @@
+#!/usr/bin/python3
+
+import argparse
+import pathlib
+import shutil
+
+DEFAULT_CONFIG = """
+extensions:
+  linux-tools:
+    enabled: true
+    type: stdio
+    name: linux-tools
+    description: Linux Tools
+    cmd: /usr/bin/linux-mcp-server
+    args: []
+    envs:
+      LINUX_MCP_ALLOWED_LOG_PATHS: /var/log/messages
+    env_keys: []
+    timeout: 30
+    bundled: null
+    available_tools: []
+
+GOOSE_PROVIDER: google
+GOOSE_MODE: smartapprove
+GOOSE_MODEL: gemini-2.5-flash
+GOOSE_TELEMETRY_ENABLED: false
+GOOSE_ALLOWLIST: ""
+SECURITY_PROMPT_ENABLED: true
+""".lstrip()
+
+
+def backup_config(config_path: pathlib.Path, max_backups: int = 5):
+    config_path = pathlib.Path(config_path).expanduser()
+    if not config_path.exists():
+        return
+
+    backup = config_path.with_suffix(f"{config_path.suffix}.bak")
+    for n in range(max_backups, 1, -1):
+        # Rotate backup files
+        older = backup.with_suffix(f".bak.{n - 1}")
+        newer = config_path.with_suffix(f"{config_path.suffix}.bak.{n}")
+        if older.exists():
+            shutil.move(older, newer)
+
+    if backup.exists():
+        shutil.move(backup, backup.with_suffix(".bak.1"))
+
+    shutil.copy2(config_path, backup)
+
+    # Cleanup stale backups
+    for i in range(max_backups + 1, max_backups + 10):
+        stale = config_path.with_suffix(f".bak.{i}")
+        if stale.exists():
+            stale.unlink()
+        else:
+            break
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=pathlib.Path,
+        default=pathlib.Path("~/.config/goose/config.yaml").expanduser(),
+    )
+    parser.add_argument("-o", "--overwrite", action="store_true")
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    config = args.config
+
+    if not config.exists():
+        config.write_text(DEFAULT_CONFIG)
+
+    if args.overwrite:
+        backup_config(config)
+        config.write_text(DEFAULT_CONFIG)
+
+
+if __name__ == "__main__":
+    main()
