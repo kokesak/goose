@@ -11,7 +11,7 @@ extensions:
     type: stdio
     name: linux-tools
     description: Linux Tools
-    cmd: /usr/bin/linux-mcp-server
+    cmd: linux-mcp-server
     args: []
     envs:
       LINUX_MCP_ALLOWED_LOG_PATHS: /var/log/messages
@@ -75,10 +75,15 @@ def main():
 
     if not config.exists():
         config.write_text(DEFAULT_CONFIG)
-
-    if args.overwrite:
+    elif args.overwrite:
         backup_config(config)
         config.write_text(DEFAULT_CONFIG)
+    else:
+        print(
+            f"Found existing configuration at {config}. To backup and overwrite this configuration, run with '--overwrite'."
+        )
+
+    print(f"Wrote configuration to {config}.")
 
 
 if __name__ == "__main__":
