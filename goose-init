@@ -129,16 +129,17 @@ def main():
     config = args.config
 
     config.parent.mkdir(parents=True, exist_ok=True)
-    if not config.exists():
-        config.write_text(DEFAULT_CONFIG)
-    elif args.overwrite:
-        backup_config(config)
-        config.write_text(DEFAULT_CONFIG)
-    else:
-        print(
-            f"Found existing configuration at {config}. To backup and overwrite this configuration, run with '--overwrite'."
-        )
+    if config.exists():
+        if not args.overwrite:
+            print(
+                f"Found existing configuration at {config}. "
+                "To backup the current config and write a new config, run with '--overwrite'."
+            )
+            return
 
+        backup_config(config)
+
+    config.write_text(DEFAULT_CONFIG)
     print(f"Wrote configuration to {config}.")
 
 
