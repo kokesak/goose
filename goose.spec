@@ -1,15 +1,13 @@
 %bcond check 1
 
+Name:           goose
 # We are currently stuck on this stable version due to some constraints related
 # to newer dependencies to goose and how they handle their releases. We will be
 # able to update to >=1.24 once upstream have a more logical way of handling
 # features like code execution, plugins and etc, which brings dependencies like
 # `v8` and `deno-core`, that are very difficult to handle.
 # See https://issues.redhat.com/browse/RSPEED-2434 for more details.
-%global stable_version 1.23.2
-
-Name:           goose
-Version:        %{stable_version}
+Version:        1.23.2
 Release:        %autorelease
 Summary:        Extensible AI agent client
 URL:            https://github.com/block/goose
@@ -30,6 +28,11 @@ Source4:        d3-sankey.license
 Source5:        leaflet.license
 Source6:        leaflet-markercluster.license
 Source7:        mermaid.license
+# This script is used to generate the vendor tarball for goose, and while it
+# does not offer any practical/real usage for the application, it helps us to
+# easily generate the vendored tarball and apply the correct patches while
+# doing so.
+Source99:        generate-vendor-tarball.sh
 
 # Remove windows specific dependencies (winapi/winreg) from goose crates.
 Patch:          0001-Patch-windows-dependencies-across-workspace.patch
@@ -56,16 +59,33 @@ Patch4:         0004-Downstream-only-never-use-pre-generated-object-files.patch
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/chart.min.js
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/mermaid.min.js
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/leaflet.markercluster.min.js
+#
 # ISC (Minified JavaScript library):
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/d3.min.js
+#
 # BSD-3-Clause (Minified Javascript library):
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/d3.sankey.min.js
+#
 # BSD-2-Clause: (Minified JavaScript library and CSS stylesheet)
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/leaflet.min.js
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/leaflet.min.css
-# CC0-1.0:
-#   - This license comes from the crate `constant_time_eq` (vendored), in
-#     which, already exists in fedora, so it's fine to keep it here.
+#
+# CC0-1.0 (constant_time_eq, vendored):
+#   - This package was discussed over the legal ML, due to it being present in
+#     Fedora already, but having a SPDX license that is not allowed.
+#   - https://lists.fedoraproject.org/archives/list/legal@lists.fedoraproject.org/thread/262UHMIUTLU3IMEQCFJUIS4EJIMEIRCN/
+#
+# A couple of files present under `crates/goose-mcp` and `crates/goose-bench`
+# were discussed in the legal ML due to them not having a clear license or
+# copyright terms in the usptream repository.The discussion of those items can
+# be seen at:
+#   - https://lists.fedoraproject.org/archives/list/legal@lists.fedoraproject.org/thread/JDE6YNL42ZKVA5ZF4PEUGI5SV2PCSHIR/
+#
+# For convenience, the items discussed in the legal ML thread are namely:
+#   - https://github.com/block/goose/tree/v1.23.2/crates/goose-mcp/src/computercontroller/tests/data
+#   - https://github.com/block/goose/tree/v1.23.2/crates/goose-bench/src/assets
+#   - https://github.com/block/goose/tree/v1.23.2/crates/goose-cli/src/scenario_tests/recordings
+#
 #
 # Rust crates compiled into the executable contribute additional license terms.
 # To obtain the following list of licenses, build the package and note the
@@ -113,10 +133,8 @@ License:        %{shrink:
                 AND (Apache-2.0 OR BSD-3-Clause)
                 AND (Apache-2.0 OR BSD-3-Clause OR MIT)
                 AND (Apache-2.0 OR BSL-1.0)
-                AND (Apache-2.0 OR BSL-1.0 OR MIT)
                 AND (Apache-2.0 OR CC0-1.0 OR MIT-0)
-                AND (Apache-2.0 OR GPL-2.0)
-                AND (Apache-2.0 OR ISC OR MIT)
+                AND (Apache-2.0 OR GPL-2.0-only)
                 AND (Apache-2.0 OR LGPL-2.1-or-later OR MIT)
                 AND (Apache-2.0 OR MIT)
                 AND (Apache-2.0 OR MIT OR Zlib)
@@ -170,10 +188,10 @@ BuildRequires:  libzstd-devel
 # - Rust: MIT
 Provides:       bundled(sublime-syntax) = 4075~gitfa6b862
 
-# third-party language definitions for syntax highlighting The `syntect` crate
+# Third-party language definitions for syntax highlighting The `syntect` crate
 # is bundling all of sublimehq/Packages syntax definitions. To achieve the
 # below list of langauge definitions syntaxes, use the following command:
-#    * cd %%{crate}-%%{version}/vendor/syntect-*/assets/default_newlines.packdump | xxd
+#    * strings %%{name}-%%{version}/vendor/syntect-*/assets/default_newlines.packdump | grep 'Packages/'
 Provides:       bundled(sublime-syntax-ASP)
 Provides:       bundled(sublime-syntax-ActionScript)
 Provides:       bundled(sublime-syntax-AppleScript)
@@ -214,26 +232,29 @@ Provides:       bundled(sublime-syntax-SQL)
 Provides:       bundled(sublime-syntax-Scala)
 Provides:       bundled(sublime-syntax-ShellScript)
 Provides:       bundled(sublime-syntax-TCL)
-Provides:       bundled(sublime-syntax-Text)
 Provides:       bundled(sublime-syntax-Textile)
 Provides:       bundled(sublime-syntax-XML)
 Provides:       bundled(sublime-syntax-YAML)
 
 # Default themes that are shipped with `syntect` crate under the assets folder.
-# To achieve the below list of themes definitions, use the following command:
-#    * cd %%{crate}-%%{version}/vendor/syntect-*/assets/default.themedump | xxd
+# To achieve the below list of themes definitions, see:
+#   * https://github.com/trishume/syntect/blob/v5.3.0/src/dumps.rs#L207-L218.
+#
 # InspiredGithub theme: MIT
 Provides:       bundled(syntect-theme-InspiredGithub)
 # Solarized theme: MIT
 Provides:       bundled(syntect-theme-Solarized)
 # Spacegray theme: MIT
+# The specific themes mentioned in the above snippet for syntect#v5.3.0
+# (src/dump.rs#L212) is included in the Spacegray theme.
 Provides:       bundled(sublime-theme-Spacegray)
 
 # Minified JavaScript libraries and minified CSS stylesheets contained in
 # `goose-mcp` crate for the autovisualizer tool.
 #   * crates/goose-mcp/src/autovisualizer/templates/assets/
 #
-# Versions where checked under each minified file.
+# Note: Versions where checked under each minified file.
+#
 # chart.min.js: MIT
 Provides:       bundled(chart-min-js) = 4.5.0
 # d3.min.js: ISC
@@ -247,14 +268,30 @@ Provides:       bundled(leaflet-min-css) = 1.9.4
 # leaflet-markercluster.min.js: MIT
 Provides:       bundled(leaflet-markercluster-min-js) = 1.5.3
 # mermaid.min.js: MIT
+# Couldn't find a version of the mermaid library inside the minified file. We
+# assume it is the latest version, as all the others are also in the latest,
+# but since we were not able to identify it, better to be safe and not provide
+# any version here.
 Provides:       bundled(mermaid-min-js)
 
 %description
-an open source, extensible AI agent that goes beyond code suggestions -
-install, execute, edit, and test with any LLM.
+Goose is your on-machine AI agent, capable of automating complex development
+tasks from start to finish. More than just code suggestions, goose can build
+entire projects from scratch, write and execute code, debug failures,
+orchestrate workflows, and interact with external APIs - autonomously.
+
+Whether you're prototyping an idea, refining existing code, or managing
+intricate engineering pipelines, goose adapts to your workflow and executes
+tasks with precision.
+
+Designed for maximum flexibility, goose works with any LLM and supports
+multi-model configuration to optimize performance and cost, seamlessly
+integrates with MCP servers, and is available as both a desktop app as well as
+CLI - making it the ultimate AI assistant for developers who want to move
+faster and focus on innovation.
 
 %prep
-%autosetup -n %{name}-%{version} -p1 -a1
+%autosetup -p1 -a1
 
 # Copy JavaScript/CSS license text into %%{name}-%%{version} folder.
 cp -pav %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7} .
@@ -283,11 +320,14 @@ rm crates/goose-cli/src/scenario_tests/test_data/test_image.jpg
 # Helper function to prune vendored folders that contains C libraries or
 # pre-defined objects. All pruned libraries here should be linked against
 # system libraries instead.
+#
+# Note: The operations `rm` and `find` in this helper function are split to
+# allow easier reading and maintenance, but they could be grouped together in
+# just one find command.
 prune_vendor() {
     local crate_pattern="$1"
     local path_to_remove="$2"
 
-    # Remove the vendored source
     # We use ${var} without quotes here to allow the '*' glob to expand
     rm -rf ${crate_pattern}/${path_to_remove}
 
@@ -313,12 +353,16 @@ prune_vendor "ring-*" "pregenerated"
 find . -maxdepth 1 -path "*/zstd-*" \
     -exec tomcli set "{}/Cargo.toml" append features.default pkg-config \; \
     -exec sed -i.uncheck -e 's/"files":{[^}]*}/"files":{ }/' "{}/.cargo-checksum.json" \;
+
 prune_vendor "zstd-sys-*" "zstd"
 
-# Update posthog-rs to reqwest 0.12.28 (same version as goose) and try to
-# remove rustls-tls and append native-tls to the features.
-# Workaround until https://github.com/PostHog/posthog-rs/pull/55  get merged
-# and goose update it's version.
+# Update posthog-rs to use reqwest 0.12.28 (same version as goose) so we are
+# able to swap rustls-tls for native-tls in the features.
+#
+# This is a workaround until https://github.com/PostHog/posthog-rs/pull/55 get
+# merged and released. Once that happens, we will be able to swap in the
+# Cargo.toml (via our existing patch) and not have to modify the vendored
+# Cargo.toml directly.
 find . -maxdepth 1 -path "*/posthog-rs-*" \
     -exec tomcli set "{}/Cargo.toml" str dependencies.reqwest.version "0.12.28" \; \
     -exec tomcli set "{}/Cargo.toml" arrays delitem dependencies.reqwest.features "rustls-tls" \; \
