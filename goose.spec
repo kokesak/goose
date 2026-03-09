@@ -1,4 +1,6 @@
 %bcond check 1
+# Limit parallel processes to prevent OOM during build:
+%global _smp_tasksize_proc 4096
 
 Name:           goose
 # We are currently stuck on this stable version due to some constraints related
