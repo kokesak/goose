@@ -166,7 +166,7 @@ BuildRequires:  dbus-devel
 # Required by crate libgit2-sys (vendored)
 BuildRequires:  libgit2-devel
 # Required by crate libsqlite3-sys (vendored)
-BuildRequires:  clang-devel
+BuildRequires:  clang
 BuildRequires:  pkgconfig(sqlite3)
 # Required by crate onig_sys (vendored)
 BuildRequires:  oniguruma-devel
