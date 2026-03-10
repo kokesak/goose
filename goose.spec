@@ -72,6 +72,11 @@ Patch4:         0004-Downstream-only-never-use-pre-generated-object-files.patch
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/leaflet.min.js
 #   - crates/goose-mcp/src/autovisualiser/templates/assets/leaflet.min.css
 #
+# CC-BY-4.0:
+#   - All documentation (excluding specifications)
+#
+# licensecheck will report that set of 6 licenses for the source archive.
+#
 # CC0-1.0 (constant_time_eq, vendored):
 #   - This package was discussed over the legal ML, due to it being present in
 #     Fedora already, but having a SPDX license that is not allowed.
