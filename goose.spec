@@ -317,6 +317,11 @@ rm -rf ui
 # goose.
 rm -rf bin
 
+# Remove the `services` folder as it contains an `ask-ai-bot` that is used
+# mainly for the discord community, which, does not provide any benefit to keep
+# it here as it is not being used by the goose source in any way or form.
+rm -rf services
+
 # Remove the `test_image.jpg` as we are not sure if this was LLM generated or
 # made by a human. Since there is no copyright data anywhere in the repository
 # mentioning this and the PR that introduced it
