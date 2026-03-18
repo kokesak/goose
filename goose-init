@@ -84,12 +84,18 @@ extensions:
     display_name: Todo
     bundled: true
     available_tools: []
-GOOSE_PROVIDER: google
-GOOSE_MODE: smartapprove
-GOOSE_MODEL: gemini-2.5-flash
+GOOSE_CONTEXT_STRATEGY: prompt
+GOOSE_DISABLE_SESSION_NAMING: true
+GOOSE_MAX_TOKENS: 16000
+GOOSE_MAX_TURNS: 200
+GOOSE_MODE: approve
+GOOSE_MOIM_MESSAGE_TEXT: "You are a Red Hat Enterprise Linux expert."
+GOOSE_RANDOM_THINKING_MESSAGES: false
+GOOSE_SUBAGENT_MAX_TURNS: 25
 GOOSE_TELEMETRY_ENABLED: false
-GOOSE_ALLOWLIST: ""
+OTEL_SDK_DISABLED: true
 SECURITY_PROMPT_ENABLED: true
+SECURITY_PROMPT_THRESHOLD: 0.9
 """.lstrip()
 
 
