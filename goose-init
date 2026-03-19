@@ -53,7 +53,7 @@ extensions:
     bundled: true
     available_tools: []
   chatrecall:
-    enabled: false
+    enabled: true
     type: platform
     name: chatrecall
     description: Search past conversations and load session summaries for contextual memory
