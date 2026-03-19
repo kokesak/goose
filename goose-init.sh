@@ -1,10 +1,6 @@
-#!/usr/bin/python3
+#!/bin/bash
 
-import argparse
-import pathlib
-import shutil
-
-DEFAULT_CONFIG = """
+read -r -d '' DEFAULT_CONFIG << 'EOF'
 extensions:
   linux-tools:
     enabled: true
@@ -96,67 +92,14 @@ GOOSE_TELEMETRY_ENABLED: false
 OTEL_SDK_DISABLED: true
 SECURITY_PROMPT_ENABLED: true
 SECURITY_PROMPT_THRESHOLD: 0.9
-""".lstrip()
+EOF
 
+CONFIG_DIR="${HOME}/.config/goose"
+CONFIG_FILE="${CONFIG_DIR}/config.yaml"
 
-def backup_config(config_path: pathlib.Path, max_backups: int = 5):
-    config_path = pathlib.Path(config_path).expanduser()
-    if not config_path.exists():
-        return
+if [[ -f "${CONFIG_FILE}" ]]; then
+    exit 0
+fi
 
-    backup = config_path.with_suffix(f"{config_path.suffix}.bak")
-    for n in range(max_backups, 1, -1):
-        # Rotate backup files
-        older = backup.with_suffix(f".bak.{n - 1}")
-        newer = config_path.with_suffix(f"{config_path.suffix}.bak.{n}")
-        if older.exists():
-            shutil.move(older, newer)
-
-    if backup.exists():
-        shutil.move(backup, backup.with_suffix(".bak.1"))
-
-    shutil.copy2(config_path, backup)
-
-    # Cleanup stale backups
-    for i in range(max_backups + 1, max_backups + 10):
-        stale = config_path.with_suffix(f".bak.{i}")
-        if stale.exists():
-            stale.unlink()
-        else:
-            break
-
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c",
-        "--config",
-        type=pathlib.Path,
-        default=pathlib.Path("~/.config/goose/config.yaml").expanduser(),
-    )
-    parser.add_argument("-o", "--overwrite", action="store_true")
-
-    return parser.parse_args()
-
-
-def main():
-    args = parse_args()
-    config = args.config
-
-    config.parent.mkdir(parents=True, exist_ok=True)
-    if config.exists():
-        if not args.overwrite:
-            print(
-                f"Found existing configuration at {config}. "
-                "To backup the current config and write a new config, run with '--overwrite'."
-            )
-            return
-
-        backup_config(config)
-
-    config.write_text(DEFAULT_CONFIG)
-    print(f"Wrote configuration to {config}.")
-
-
-if __name__ == "__main__":
-    main()
+mkdir -p "${CONFIG_DIR}"
+printf '%s\n' "${DEFAULT_CONFIG}" > "${CONFIG_FILE}"
