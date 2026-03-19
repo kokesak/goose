@@ -404,7 +404,9 @@ export RUSTONIG_SYSTEM_LIBONIG=1
 %install
 install -Dpm 0755 target/rpm/goose -t %{buildroot}%{_bindir}
 install -Dpm 0755 target/rpm/goosed -t %{buildroot}%{_bindir}
+%if %{?rhel:%{rhel}}%{!?rhel:0} >= 9 || %{?epel:%{epel}}%{!?epel:0} >= 9
 install -Dpm 0755 goose-init -t %{buildroot}%{_bindir}
+%endif
 
 %if %{with check}
 %check
@@ -443,7 +445,8 @@ skip="${skip-} --skip scenario_tests::scenarios::tests::test_image_analysis"
 
 %{_bindir}/goose
 %{_bindir}/goosed
-%{_bindir}/goose-init
+%if %{?rhel:%{rhel}}%{!?rhel:0} >= 9 || %{?epel:%{epel}}%{!?epel:0} >= 9
+%endif
 
 %changelog
 %autochangelog
