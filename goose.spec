@@ -446,6 +446,7 @@ skip="${skip-} --skip scenario_tests::scenarios::tests::test_image_analysis"
 %{_bindir}/goose
 %{_bindir}/goosed
 %if %{?rhel:%{rhel}}%{!?rhel:0} >= 9 || %{?epel:%{epel}}%{!?epel:0} >= 9
+%{_bindir}/goose-init  # Program for creating default Red Hat recommended config
 %endif
 
 %changelog
