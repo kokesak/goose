@@ -27,6 +27,9 @@ jobs:
     trigger: pull_request
     owner: "@rhel-lightspeed"
     project: goose
+    # Goose builds usually take a long time to finish, so we set it to 5h, just
+    # in case.
+    timeout: 36000
     targets:
       - fedora-43-x86_64
       - fedora-43-aarch64
@@ -46,6 +49,9 @@ jobs:
     trigger: commit
     owner: "@rhel-lightspeed"
     project: goose
+    # Goose builds usually take a long time to finish, so we set it to 5h, just
+    # in case.
+    timeout: 36000
     targets:
       - fedora-43-x86_64
       - fedora-43-aarch64
