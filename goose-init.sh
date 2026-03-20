@@ -102,3 +102,6 @@ if [[ ! -f "${CONFIG_FILE}" ]]; then
   printf '%s\n' "${DEFAULT_CONFIG}" > "${CONFIG_FILE}"
 fi
 
+unset CONFIG_DIR
+unset CONFIG_FILE
+unset DEFAULT_CONFIG
