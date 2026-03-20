@@ -97,9 +97,8 @@ EOF
 CONFIG_DIR="${HOME}/.config/goose"
 CONFIG_FILE="${CONFIG_DIR}/config.yaml"
 
-if [[ -f "${CONFIG_FILE}" ]]; then
-    exit 0
+if [[ ! -f "${CONFIG_FILE}" ]]; then
+  mkdir -p "${CONFIG_DIR}"
+  printf '%s\n' "${DEFAULT_CONFIG}" > "${CONFIG_FILE}"
 fi
 
-mkdir -p "${CONFIG_DIR}"
-printf '%s\n' "${DEFAULT_CONFIG}" > "${CONFIG_FILE}"
