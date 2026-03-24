@@ -46,6 +46,8 @@ build: srpm
 		--chroot fedora-43-x86_64 \
 		--chroot fedora-44-x86_64 \
 		--chroot fedora-rawhide-x86_64 \
+		--chroot epel-9-x86_64 \
+		--chroot epel-10-x86_64 \
 		--timeout 36000
 
 .PHONY: logs
