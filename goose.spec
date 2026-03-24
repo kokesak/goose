@@ -30,6 +30,7 @@ Source4:        d3-sankey.license
 Source5:        leaflet.license
 Source6:        leaflet-markercluster.license
 Source7:        mermaid.license
+Source8:        goose-init.sh
 # This script is used to generate the vendor tarball for goose, and while it
 # does not offer any practical/real usage for the application, it helps us to
 # easily generate the vendored tarball and apply the correct patches while
@@ -403,6 +404,9 @@ export RUSTONIG_SYSTEM_LIBONIG=1
 %install
 install -Dpm 0755 target/rpm/goose -t %{buildroot}%{_bindir}
 install -Dpm 0755 target/rpm/goosed -t %{buildroot}%{_bindir}
+%if %{?rhel:%{rhel}}%{!?rhel:0} >= 9 || %{?epel:%{epel}}%{!?epel:0} >= 9
+install -Dpm 0755 %{SOURCE8} %{buildroot}%{_sysconfdir}/profile.d/goose-init.sh
+%endif
 
 %if %{with check}
 %check
@@ -441,6 +445,10 @@ skip="${skip-} --skip scenario_tests::scenarios::tests::test_image_analysis"
 
 %{_bindir}/goose
 %{_bindir}/goosed
+%if %{?rhel:%{rhel}}%{!?rhel:0} >= 9 || %{?epel:%{epel}}%{!?epel:0} >= 9
+# Creates default Red Hat recommended config if needed
+%{_sysconfdir}/profile.d/goose-init.sh
+%endif
 
 %changelog
 %autochangelog
