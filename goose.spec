@@ -48,6 +48,9 @@ Patch1:         0002-Disable-rustls-and-default-features-for-some-librari.patch
 # re-create the dependencies patch easily without having to modify source code
 # when a new version is pushed.
 Patch2:         0003-Patch-code-to-use-native-tls-instead-of-rustls.patch
+# Downstream patch to update tar for version 0.4.45. This patch can be dropped
+# once https://issues.redhat.com/browse/RSPEED-2434 is fixed.
+Patch3:         0004-Fix-for-CVE-2026-33056-on-tar.patch
 # Patch the `build.rs` for `ring` crate to avoid using the pre-generated object
 # files that comes with the vendored crate, and instead, build from system
 # libraries.
