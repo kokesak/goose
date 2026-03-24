@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+
+early_access: false
+
+reviews:
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  collapse_walkthrough: true
+  sequence_diagrams: false
+  changed_files_summary: true
+  labeling_instructions: []
+  path_filters: []
+
+  path_instructions:
+    - path: "*.spec"
+      instructions: |
+        This is an RPM spec file for packaging a Rust application (Goose) in
+        Fedora, EPEL, and RHEL Extensions. Review it according to:
+
+        **Fedora Packaging Guidelines:**
+        - https://docs.fedoraproject.org/en-US/packaging-guidelines/
+        - Verify correct use of RPM macros (%autosetup, %autorelease, %autochangelog, etc.)
+        - Ensure License field uses valid SPDX license expressions
+        - Verify BuildRequires are complete and correct
+        - Check that %files section lists all installed files with correct permissions
+        - Ensure %doc and %license directives are used appropriately
+        - Verify Source URLs are correct and use macros where possible
+        - Check for proper use of %{name} and %{version} macros in Source tags
+        - Ensure %description is informative and does not repeat the Name
+
+        **Fedora Rust Packaging Guidelines:**
+        - https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/
+        - Verify correct use of cargo-rpm-macros (%cargo_prep, %cargo_build, %cargo_test, %cargo_install)
+        - Ensure %cargo_vendor_manifest and %{cargo_license_summary} are used for vendored builds
+        - Verify vendored dependencies are handled correctly (vendor tarball pattern)
+        - Check that system libraries are preferred over bundled C libraries in vendored crates
+        - Ensure Provides: bundled() entries are present for all bundled content
+        - Verify LICENSE.dependencies is generated and included as %license
+
+        **Common issues to watch for:**
+        - Missing or incorrect BuildRequires for system libraries linked by vendored -sys crates
+        - Patches should have clear comments explaining their purpose
+        - The License field must account for all vendored crate licenses (use cargo_license_summary output)
+        - Conditional builds (%bcond) should be properly documented
+        - Version pinning constraints and rationale should be documented in comments
+
+    - path: "*.patch"
+      instructions: |
+        This is a downstream patch applied during RPM package build. Review for:
+        - Correctness of the patch (does it achieve its stated goal?)
+        - Minimal invasiveness (patches should change only what is necessary)
+        - Whether the patch modifies Cargo.toml dependency specifications correctly
+        - For Rust crates: verify feature flag changes are consistent and complete
+        - Check that rustls-to-native-tls swaps are complete (no leftover rustls references)
+        - Ensure Windows-specific dependency removal does not break Linux builds
+        - Verify patch context lines match the expected upstream version
+
+    - path: "generate-vendor-tarball.sh"
+      instructions: |
+        This script generates the vendored dependency tarball for offline Rust builds.
+        Review for:
+        - Correct cargo vendor workflow
+        - Proper application of patches before vendoring
+        - Tarball naming convention matches what the spec file expects
+        - Security: no credentials or tokens hardcoded
+        - Shell best practices (set -euo pipefail, quoting, etc.)
+
+    - path: "*.license"
+      instructions: |
+        These are license text files for bundled JavaScript/CSS libraries embedded
+        in the upstream source. Verify:
+        - License text matches the SPDX identifier claimed in the spec file
+        - The license file corresponds to a Provides: bundled() entry in the spec
+
+    - path: "Makefile"
+      instructions: |
+        This Makefile automates RPM build workflows (copr builds, srpm generation,
+        source downloads). Review for:
+        - Correct use of fedpkg and copr CLI tools
+        - Proper variable quoting and shell safety
+        - Targets are well-documented and follow conventions
+
+  tools:
+    shellcheck:
+      enabled: true
+    markdownlint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto
