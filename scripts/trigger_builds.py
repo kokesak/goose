@@ -10,6 +10,7 @@ Authentication requires a ~/.config/copr file or COPR_LOGIN, COPR_TOKEN, COPR_US
 
 import argparse
 import dataclasses
+import math
 import os
 import sys
 import time
@@ -137,6 +138,34 @@ def monitor_builds(client: Client, builds: list[dict], poll_interval: float) -> 
     return all(b["state"] == "succeeded" for b in builds)
 
 
+def positive_float(value: str | float) -> float:
+    if not isinstance(value, float):
+        exception = argparse.ArgumentTypeError(f"Value must be a positive float: {value}")
+        try:
+            value = float(value)
+        except ValueError:
+            raise exception
+
+        if value <= 0 or not math.isfinite(value):
+            raise exception
+
+    return value
+
+
+def positive_int(value: str | int) -> int:
+    if not isinstance(value, int):
+        exception = argparse.ArgumentTypeError(f"Value must be a positive integer: {value}")
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            raise exception
+
+        if value <= 0:
+            raise exception
+
+    return value
+
+
 def parse_args() -> argparse.Namespace:
     targeter = Targeter()
     parser = argparse.ArgumentParser(
@@ -156,7 +185,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--poll-interval",
         "-S",
-        type=float,
+        type=positive_float,
         default=30.0,
         metavar="S",
         help="Seconds between status polls (default: 30).",
@@ -164,7 +193,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--timeout",
         "-t",
-        type=int,
+        type=positive_int,
         default=36000,
         metavar="S",
         help="Build timeout in seconds (default: 36000).",
