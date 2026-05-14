@@ -11,7 +11,7 @@ srpm_build_deps:
   - openssl-devel
 
 actions:
-  # The last setp here is required by Packit to return the archive name
+  # The last step here is required by Packit to return the archive name
   # https://packit.dev/docs/configuration/actions#create-archive
   create-archive:
     - bash -c "cargo install cargo-vendor-filterer@0.5.18"
@@ -22,6 +22,13 @@ actions:
   # and it's easier to just sed it out and fix in the fix-spec-file
   fix-spec-file:
     - sed -Ei 's|^(Source:[[:space:]]+)goose-[0-9]+(\.[0-9]+)*-vendor\.tar\.xz|\1%{url}/archive/v%{version}/%{name}-%{version}.tar.gz|' goose.spec
+    # Update Release with Packit's generated value (includes PR/branch identifier).
+    # For PR builds this produces e.g. 1.TIMESTAMP.prNN.N.gHASH
+    # For main builds this produces e.g. 1.TIMESTAMP.main.N.gHASH
+    - "bash -c 'sed -i -r \"s/Release:(\\s*).*/Release:\\1${PACKIT_RPMSPEC_RELEASE}%{?dist}/\" goose.spec'"
+  # Do not get the version from a tag (git describe) but from the spec file.
+  get-current-version:
+    - grep -oP '^Version:\s+\K\S+' goose.spec
 
 _:
   disable_checks: &disable_checks
@@ -77,10 +84,10 @@ jobs:
     timeout: 36000
     targets: *pr_targets
 
-
   # Build on new commit to main branch
   - job: copr_build
     trigger: commit
+    branch: main
     owner: "@rhel-lightspeed"
     project: goose
     # Goose builds usually take a long time to finish, so we set it to 5h, just
