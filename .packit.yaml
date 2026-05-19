@@ -94,3 +94,30 @@ jobs:
     # in case.
     timeout: 36000
     targets: *targets
+
+  # Run internal test suite on Testing Farm (Red Hat ranch)
+  - job: tests
+    trigger: pull_request
+    fmf_url: "https://gitlab.cee.redhat.com/rhel-lightspeed/enhanced-shell/goose-tests"
+    fmf_ref: "main"
+    use_internal_tf: True
+    identifier: goose-tests
+    env:
+      GOOSE_TESTS_GOOSE_REDHAT_PACKAGE_SOURCE_PROFILE: "copr"
+    targets:
+      # Run the x86_64 archs only for pull requests. This is faster and "economical" than having all other architectures as well.
+      # We rarely see issues on other architectures, we only run them on a weekly basis inside the "rhel-lightspeed/enhanced-shell/goose-tests" repository as a scheduled pipeline.
+      rhel-10-x86_64:
+        distros:
+          - RHEL-10.2-Nightly
+          - RHEL-10.3-Nightly
+      rhel-9-x86_64:
+        distros:
+          - RHEL-9.8.0-Nightly
+          - RHEL-9.9.0-Nightly
+    tf_extra_params:
+      environments:
+        - settings:
+            provisioning:
+              tags:
+                BusinessUnit: rhel_sst_lightspeed@upstream
