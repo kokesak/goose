@@ -125,10 +125,10 @@ jobs:
   # Run public test suite on Testing Farm (Red Hat ranch)
   - <<: *goose_tests_base
     # The public test suite is an imported test plan, that's why we use the main branch here.
+    fmf_url: "https://gitlab.com/redhat/centos-stream/tests/goose"
     fmf_ref: "main"
     identifier: goose-tests-public
-    tmt_plan: "goose-public"
-    env: ~
+    tmt_plan: "/plans"
     targets:
       <<: *rhel_x86_64_targets
       fedora-44-x86_64:
